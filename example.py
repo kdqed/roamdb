@@ -1,6 +1,6 @@
 import socket
 import json
-import urllib3
+import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from threading import local
 
@@ -9,7 +9,6 @@ DB_HOST = "127.0.0.1"
 DB_PORT = 26227
 DB_NAME = "hackernews"
 
-http = urllib3.PoolManager()
 thread_local = local()
 
 
@@ -47,7 +46,6 @@ def setup():
             score INTEGER,
             time INTEGER,
             descendants INTEGER,
-            raw TEXT
         )
     """)
     db.close()
@@ -55,13 +53,13 @@ def setup():
 
 def fetch_and_insert(item_id):
     try:
-        resp = http.request("GET", HN_API.format(item_id), timeout=10)
-        item = json.loads(resp.data.decode())
+        with urllib.request.urlopen(HN_API.format(item_id), timeout=10) as resp:
+            item = json.loads(resp.read().decode())
         if not item:
             return
         db = get_client()
-        db.query(
-            "INSERT OR REPLACE INTO items (id, type, by, title, text, url, score, time, descendants, raw) VALUES (?,?,?,?,?,?,?,?,?,?)",
+        result = db.query(
+            "INSERT OR REPLACE INTO items (id, type, by, title, text, url, score, time, descendants) VALUES (?,?,?,?,?,?,?,?,?)",
             [
                 item.get("id"),
                 item.get("type"),
@@ -72,9 +70,9 @@ def fetch_and_insert(item_id):
                 item.get("score"),
                 item.get("time"),
                 item.get("descendants"),
-                json.dumps(item),
             ]
         )
+        assert 'error' not in result
         print(f"[ok] {item_id} - {item.get('type')} by {item.get('by')}")
     except Exception as e:
         print(f"[err] {item_id}: {e}")

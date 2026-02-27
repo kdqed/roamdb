@@ -117,8 +117,8 @@ RoamDB's entire philosophy: **your data is a file**.
 
 | Scenario | What you do |
 |---|---|
-| Move to a new server | `cp data/ new-server:data/` |
-| Back up everything | `tar -czf backup.tar.gz data/` |
+| Move to a new server | `cp server/data/ new-server:server/data/` |
+| Back up everything | `tar -czf backup.tar.gz server/data/` |
 | Share a dataset | Send the `.db` file |
 | Inspect the data | Open with DB Browser for SQLite |
 | Escape RoamDB entirely | It's just SQLite. Open it with anything. |
@@ -130,11 +130,11 @@ RoamDB's entire philosophy: **your data is a file**.
 ```
 .
 ├── server/
-│   └── main.go       # The whole server. One file. ~100 lines.
-├── example.py        # HackerNews scraper demo
-└── data/             # Your databases live here (created on first run)
-    ├── myapp.db
-    └── hackernews.db
+│   ├── main.go             # The whole server. One file. ~100 lines.
+│   └── data/               # Your databases live here (created on first run)
+│       ├── myapp.db
+│       └── hackernews.db
+│── example.py              # HackerNews scraper demo
 ```
 
 ---
