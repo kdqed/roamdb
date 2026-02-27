@@ -10,8 +10,8 @@ It speaks raw TCP (because HTTP has too much *baggage* 😏), handles concurrent
 
 ```
   client 1 ──┐
-  client 2 ──┼──► TCP :8080 ──► [myapp worker] ──► myapp.db
-  client 3 ──┘                ↘ [analytics worker] ──► analytics.db
+  client 2 ──┼──► TCP :26227 ──► [myapp worker] ──► myapp.db
+  client 3 ──┘                 ↘ [analytics worker] ──► analytics.db
 ```
 
 No ORM. No migrations framework. No cloud vendor lock-in. Just vibes and SQLite.
