@@ -101,7 +101,6 @@ No dependencies. Not even `requests`. Pure stdlib. The way the universe intended
 See [`example.py`](./example.py) for a fully working example that fetches HackerNews items 1–1000 with **100 concurrent workers** and inserts them into a local SQLite file.
 
 ```bash
-pip install urllib3
 python example.py
 ```
 
