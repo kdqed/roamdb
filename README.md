@@ -167,4 +167,4 @@ Pack light. Move fast. Own your data.
 
 ---
 
-*Made with ☕ and a deep suspicion of managed databases.*
+*Made with ☕, vibes, and a deep suspicion of managed databases.*
