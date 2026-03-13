@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"database/sql"
 	"encoding/json"
 	"log"
@@ -39,14 +40,14 @@ var (
 	dbs   = map[string]*dbEntry{}
 )
 
-func getEntry(name string) (*dbEntry, error) {
+func getEntry(name string, dataDir string) (*dbEntry, error) {
 	dbsMu.Lock()
 	defer dbsMu.Unlock()
 	if e, ok := dbs[name]; ok {
 		return e, nil
 	}
-	os.MkdirAll("data", 0755)
-	db, err := sql.Open("sqlite3", filepath.Join("data", name+".db"))
+	os.MkdirAll(dataDir, 0755)
+	db, err := sql.Open("sqlite3", filepath.Join(dataDir, name+".db"))
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +85,7 @@ func getEntry(name string) (*dbEntry, error) {
 	return e, nil
 }
 
-func handleConn(conn net.Conn) {
+func handleConn(conn net.Conn, dataDir string) {
 	defer conn.Close()
 	dec := json.NewDecoder(conn)
 	enc := json.NewEncoder(conn)
@@ -93,7 +94,7 @@ func handleConn(conn net.Conn) {
 		if err := dec.Decode(&req); err != nil {
 			return
 		}
-		e, err := getEntry(req.Database)
+		e, err := getEntry(req.Database, dataDir)
 		if err != nil {
 			enc.Encode(Response{Error: err.Error()})
 			return
@@ -105,7 +106,11 @@ func handleConn(conn net.Conn) {
 }
 
 func main() {
-    port := ":26227"
+	dataDir := flag.String("d", "data", "data directory")
+	portStr := flag.String("p", "26227", "port number")
+	flag.Parse()
+  	port := ":" + *portStr
+	  
 	ln, err := net.Listen("tcp", port)
 	if err != nil {
 		log.Fatal(err)
@@ -117,6 +122,6 @@ func main() {
 			log.Println(err)
 			continue
 		}
-		go handleConn(conn)
+		go handleConn(conn, *dataDir)
 	}
 }

@@ -1,3 +1,4 @@
+import traceback
 import socket
 import json
 import urllib.request
@@ -25,10 +26,12 @@ class RoamDB:
         self.f = self.sock.makefile("rwb")
 
     def query(self, sql, params=None):
-        req = {"database": self. database, "query": sql, "params": params or []}
+        req = {"database": self.database, "query": sql, "params": params or []}
+        print(req)
         self.f.write((json.dumps(req) + "\n").encode())
         self.f.flush()
-        return json.loads(self.f.readline())
+        result = json.loads(self.f.readline())
+        print(result)
 
     def close(self):
         self.sock.close()
@@ -45,7 +48,7 @@ def setup():
             url TEXT,
             score INTEGER,
             time INTEGER,
-            descendants INTEGER,
+            descendants INTEGER
         )
     """)
     db.close()
@@ -72,11 +75,13 @@ def fetch_and_insert(item_id):
                 item.get("descendants"),
             ]
         )
+        print(result)
         assert 'error' not in result
         print(f"[ok] {item_id} - {item.get('type')} by {item.get('by')}")
     except Exception as e:
+        traceback.print_exc()
         print(f"[err] {item_id}: {e}")
 
 setup()
 with ThreadPoolExecutor(max_workers=100) as pool:
-    pool.map(fetch_and_insert, range(1, 1001))
+    pool.map(fetch_and_insert, range(1, 2))
